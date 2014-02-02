@@ -20,7 +20,7 @@ require 'ostruct'
 require 'yaml'
 require 'fileutils'
 
-require './Server.rb'
+require_relative 'Server.rb'
 
 USAGE = "Usage: rc [OPTIONS] "
 
