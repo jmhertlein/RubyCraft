@@ -40,6 +40,9 @@ def parseOptions(args)
       options.backup = b
     end
 
+    opts.on("-p", "--persistent", "When starting a server, wait for it to stop then restart.") do |p|
+      options.persistent = p
+    end
   end.parse!
     
   return options
@@ -79,10 +82,18 @@ end
 if(OPTIONS.start)
   output "Starting..."
   Dir.chdir(SERVER_DIR)
-  pid = fork do
-    `screen -d -m -S mc java -jar craftbukkit.jar`
-  end
-  puts pid
+  while (true) 
+    pid = fork do
+      `screen -d -m -S mc java -jar craftbukkit.jar`
+    end
+    if(!OPTIONS.persistent)
+      break
+    elsif 
+      output "Waiting on PID #{pid} (because -p specified)"
+      wait(pid)
+      output "Restarting..."
+    end 
+  end #while
 end
 
 output "Done."
