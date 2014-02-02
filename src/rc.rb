@@ -17,83 +17,146 @@
 
 require 'optparse'
 require 'ostruct'
+require 'yaml'
 
-USAGE = "Usage: rc [OPTIONS] [serverdir]"
+require './Server.rb'
+
+USAGE = "Usage: rc [OPTIONS] "
 
 def parseOptions(args)
   options = OpenStruct.new
-  options.verbose = false
-  options.start = false
   options.backup = false
+  options.interactive = false
+  options.verbose = false
+  options.profile_file = ENV['HOME'] + ".rcraft_profile"
+
   opt_parser = OptionParser.new do |opts|
     opts.banner = USAGE
+
+    opts.on("-b=SERVER_DIR", "--backup=SERVER_DIR", "Backup the specified server.") do |b|
+      options.backup = b.nil?
+      options.server_dir = b
+    end
+
+    opts.on("-o=OUTPUT_DIR", "--output-dir=OUTPUT_DIR", "Directory the server should backup to.") do |o|
+      options.output_dir = o
+    end
     
-    opts.on("-v", "--verbose", "Display verbose output.") do |v|
+    opts.on("-p=PROFILE_FILE", "--profile=PROFILE_FILE", "File to which persistent state will be written. (Default: ~/.rcraft_profile") do |p|
+      options.profile_file = p
+    end
+
+    opts.on("-i", "--interactive", "Launch interactive server manager.") do |i|
+      options.interactive = i
+    end
+
+    opts.on("-v", "--verbose", "Print verbose output.") do |v|
       options.verbose = v
     end
 
-    opts.on("-s", "--start", "Start the server.") do |s|
-      options.start = s
-    end
-
-    opts.on("-b", "--backup", "Backup the server") do |b|
-      options.backup = b
-    end
-
-    opts.on("-p", "--persistent", "When starting a server, wait for it to stop then restart.") do |p|
-      options.persistent = p
-    end
   end.parse!
     
   return options
 end
 
+def loadProfile(profile_file) 
+  file = File.open(profile_file)
+  servers = YAML.load(file.read)
+  file.close
+
+  return servers
+end
+
+def writeProfile(profile_file, servers)
+  file = File.open(profile_file)
+  file.write(servers.to_yaml)
+  file.close
+end
+
+def printMenu()
+  puts "Usage: [char] [argument]"
+  puts "======================="
+  puts "(r)egister a server"
+  puts "(u)nregister a server"
+  puts "(s)tart a server"
+  puts "(h)alt a server"
+  puts "(k)ill a server"
+  puts "(v)iew a server"
+  puts "Print (help)"
+  puts"========================"
+end
+
+# ------------------------MAIN-------------------------
+
 OPTIONS = parseOptions(ARGV)
 
 def output(msg)
-  if(OPTIONS.verbose)
+  if(OPTIONS.verbose?)
     puts msg
   end
 end
 
-if (ARGV.size < 1)
-  puts "Error: Missing server dir."
-  puts USAGE
-  exit
-elsif (ARGV.size > 1)
-  puts "Too many arguments."
-  puts USAGE.
-  exit
-end
-
-SERVER_DIR = ARGV[0]
-output "Server Directory: #{SERVER_DIR}"
 output "Options: #{OPTIONS}"
 
-if(!OPTIONS.start && !OPTIONS.backup) 
+if(!OPTIONS.backup? && !OPTIONS.interactive?)
   puts "No actions specified, nothing to do."
   exit
 end
 
-if(OPTIONS.backup)
+if(OPTIONS.backup? && OPTIONS.interactive?)
+  puts "Both backup and interactive mode requested, but this isn't supported."
+  puts "Please either backup or run interactively, but not both at once."
+  exit
+end
+
+SERVERS = loadProfile(OPTIONS.profile_file)
+
+#-------------------------init done-------------------
+puts SERVERS
+
+if(OPTIONS.backup?)
   output "Backing up..."
+  
 end
 
-if(OPTIONS.start)
-  output "Starting..."
-  Dir.chdir(SERVER_DIR)
-  while (true) 
-    pid = fork do
-      `screen -d -m -S mc java -jar craftbukkit.jar`
-    end
-    if(!OPTIONS.persistent)
-      break
-    elsif 
-      output "Waiting on PID #{pid} (because -p specified)"
-      wait(pid)
-      output "Restarting..."
-    end 
-  end #while
+stop = false
+while(!stop)
+  printMenu()
+  char = gets
+  case char
+    when "r"
+      registerServer(SERVERS)
+    when "u"
+      unregisterServer(SERVERS)
+    when "s"
+      startServer(SERVERS)
+    when "h"
+      haltServer(SERVERS)
+    when "k"
+      killServer(SERVERS)
+    when "v"
+      viewServer(SERVERS)
+    when "help"
+      printMenu()
+    else
+      puts "Invalid command."
+      printMenu()
 end
 
+#  Dir.chdir(SERVER_DIR)
+#  while (true) 
+#    pid = fork do
+#      `screen -d -m -S mc java -jar craftbukkit.jar`
+#    end
+#    if(!OPTIONS.persistent)
+#      break
+#    elsif 
+#      output "Waiting on PID #{pid} (because -p specified)"
+#      wait(pid)
+#      output "Restarting..."
+#    end 
+#  end #while
+
+#---------------------shutdown-----------------------
+writeProfile(OPTIONS.profile_file, SERVERS)
 output "Done."
