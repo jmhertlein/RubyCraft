@@ -18,6 +18,7 @@
 require 'optparse'
 require 'ostruct'
 require 'yaml'
+require 'fileutils'
 
 require './Server.rb'
 
@@ -28,7 +29,7 @@ def parseOptions(args)
   options.backup = false
   options.interactive = false
   options.verbose = false
-  options.profile_file = ENV['HOME'] + ".rcraft_profile"
+  options.profile_file = ENV['HOME'] + "/.rcraft_profile"
 
   opt_parser = OptionParser.new do |opts|
     opts.banner = USAGE
@@ -60,17 +61,41 @@ def parseOptions(args)
 end
 
 def loadProfile(profile_file) 
+  FileUtils.touch(profile_file)
+
   file = File.open(profile_file)
   servers = YAML.load(file.read)
+  if(!servers)
+    servers = Hash.new
+  end
   file.close
 
   return servers
 end
 
 def writeProfile(profile_file, servers)
-  file = File.open(profile_file)
+  file = File.open(profile_file, 'w')
   file.write(servers.to_yaml)
   file.close
+end
+
+def registerServer(servers)
+  puts "Server Name: (for display purposes, should be unique)"
+  server_name = gets.chomp
+  puts "Server directory:"
+  server_dir = gets.chomp
+  puts "Backup directory:"
+  backup_dir = gets.chomp
+
+  s = Server.new(server_name, server_dir, backup_dir)
+  servers["#{server_name}"] = s
+end
+
+def listServers(servers)
+  puts servers
+  servers.each do |key, value|
+    puts key
+  end
 end
 
 def printMenu()
@@ -81,7 +106,9 @@ def printMenu()
   puts "(s)tart a server"
   puts "(h)alt a server"
   puts "(k)ill a server"
+  puts "(l)ist servers"
   puts "(v)iew a server"
+  puts "e(x)it"
   puts "Print (help)"
   puts"========================"
 end
@@ -98,12 +125,12 @@ end
 
 output "Options: #{OPTIONS}"
 
-if(!OPTIONS.backup? && !OPTIONS.interactive?)
+if(!OPTIONS.backup && !OPTIONS.interactive)
   puts "No actions specified, nothing to do."
   exit
 end
 
-if(OPTIONS.backup? && OPTIONS.interactive?)
+if(OPTIONS.backup && OPTIONS.interactive)
   puts "Both backup and interactive mode requested, but this isn't supported."
   puts "Please either backup or run interactively, but not both at once."
   exit
@@ -122,7 +149,7 @@ end
 stop = false
 while(!stop)
   printMenu()
-  char = gets
+  char = gets.chomp
   case char
     when "r"
       registerServer(SERVERS)
@@ -136,11 +163,18 @@ while(!stop)
       killServer(SERVERS)
     when "v"
       viewServer(SERVERS)
+    when "ls"
+      listServers(SERVERS)
+    when "l"
+      listServers(SERVERS)
+    when "x"
+      stop = true
     when "help"
       printMenu()
     else
-      puts "Invalid command."
+      puts "Invalid command: \"#{char}\"."
       printMenu()
+  end
 end
 
 #  Dir.chdir(SERVER_DIR)

@@ -1,7 +1,8 @@
 class Server
-  attr_accessor :name, :server_dir, :backup_dir, :screen_name, :persistent, :pid
+  attr_accessor :server_name, :server_dir, :backup_dir, :screen_name, :pid
 
-  def initialize(server_dir, backup_dir, persistent=false)
+  def initialize(server_name, server_dir, backup_dir)
+    @server_name = server_name
     @server_dir = server_dir
     @backup_dir = backup_dir
   end
