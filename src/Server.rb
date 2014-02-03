@@ -27,10 +27,19 @@ class Server
     Dir.chdir(@server_dir)
     @screen_name = "mc-" + @server_name.gsub(" ", "-")
     @pid = spawn("screen -d -m -S #{@screen_name} java -jar craftbukkit.jar")
+    spawn("screen -S #{@screen_name} -p 0 -X multiuser on")
   end
 
   def halt()
     spawn("screen -S #{@screen_name} -p 0 -X stuff '\nstop\n'")
+  end
+
+  def restart()
+    self.halt()
+    while(self.isRunning?)
+      sleep 1
+    end
+    self.start
   end
 
   def kill

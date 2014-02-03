@@ -90,6 +90,20 @@ def registerServer(servers)
   servers[server_name] = s
 end
 
+def restartServer(servers)
+  puts "Name of server to restart:"
+  server = gets.chomp
+  server = servers[server]
+
+  if(server.nil?)
+    puts "Unknonw server."
+  elsif(!server.isRunning?)
+    puts "Server is not running."
+  else
+    server.restart
+  end
+end
+
 def listServers(servers)
   puts servers
   servers.each do |key, value|
@@ -172,6 +186,7 @@ def printMenu()
   puts "(r)egister a server"
   puts "(u)nregister a server"
   puts "(s)tart a server"
+  puts "r(e)start a server"
   puts "(h)alt a server"
   puts "(k)ill a server"
   puts "(l)ist servers"
@@ -251,6 +266,8 @@ elsif(OPTIONS.interactive)
         listServers(SERVERS)
       when "b"
         backupServer(SERVERS)
+      when "e"
+        restartServer(SERVERS)
       when "x"
         stop = true
       when "help"
