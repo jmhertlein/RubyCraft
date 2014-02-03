@@ -25,13 +25,11 @@ class Server
   def start()
     Dir.chdir(@server_dir)
     @screen_name = "mc-" + @server_name.gsub(" ", "-")
-    @pid = fork do
-      `screen -d -m -S #{@screen_name} java -jar craftbukkit.jar`
-    end
+    @pid = spawn("screen -d -m -S #{@screen_name} java -jar craftbukkit.jar")
   end
 
   def halt()
-    `screen -S #{@screen_name} -X stuff 'stop\n'`
+    spawn("screen -S #{@screen_name} -p 0 -X stuff 'stop\n'")
   end
 
   def kill
@@ -39,11 +37,9 @@ class Server
   end
 
   def isRunning?
-    begin
-      Process.getpgid(@pid)
-      return true
-    rescue Errno::ESRCH
+    if(@pid.nil?)
       return false
     end
+    return !(`screen -ls`.scan(/#{@screen_name}/).empty?)
   end
 end
