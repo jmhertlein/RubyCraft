@@ -23,7 +23,7 @@ require 'pathname'
 
 require_relative 'Server.rb'
 
-USAGE = "Usage: rc [OPTIONS] "
+USAGE = "Usage: rc [OPTIONS]"
 
 def parseOptions(args)
   options = OpenStruct.new
