@@ -30,7 +30,7 @@ class Server
   end
 
   def halt()
-    spawn("screen -S #{@screen_name} -p 0 -X stuff 'stop\n'")
+    spawn("screen -S #{@screen_name} -p 0 -X stuff '\nstop\n'")
   end
 
   def kill
