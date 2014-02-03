@@ -79,16 +79,18 @@ def writeProfile(profile_file, servers)
   file.close
 end
 
+#------------------Menu Functions-----------------------------------
+
 def registerServer(servers)
   puts "Server Name: (for display purposes, should be unique)"
   server_name = gets.chomp
   puts "Server directory:"
-  server_dir = gets.chomp
+  server_dir = File.expand_path(gets.chomp)
   puts "Backup directory:"
-  backup_dir = gets.chomp
+  backup_dir = File.expand_path(gets.chomp)
 
   s = Server.new(server_name, server_dir, backup_dir)
-  servers["#{server_name}"] = s
+  servers[server_name] = s
 end
 
 def listServers(servers)
@@ -96,6 +98,62 @@ def listServers(servers)
   servers.each do |key, value|
     puts key
   end
+end
+
+def unregisterServer(servers)
+  puts "Name of server to delete:"
+  server = gets.chomp
+  if(servers.has_key?(server))
+    servers.delete(server)
+  elsif
+    puts "Unknown server."
+  end
+end
+
+def startServer(servers)
+  puts "Name of server to start:"
+  server = gets.chomp
+  server = servers[server]
+
+  if(server.nil?)
+    puts "Unknonw server."
+  elsif(server.isRunning?)
+    puts "Server is already running."
+  else
+    server.start
+  end
+end
+
+def haltServer(servers)
+  puts "Name of server to halt:"
+  server = gets.chomp
+  server = servers[server]
+
+  if(server.nil?)
+    puts "Unknonw server."
+  elsif(!server.isRunning?)
+    puts "Server is already halted."
+  else
+    server.halt
+  end
+end
+
+def killServer(servers)
+  puts "Name of server to kill:"
+  server = gets.chomp
+  server = servers[server]
+
+  if(server.nil?)
+    puts "Unknonw server."
+  elsif(server.isRunning?)
+    puts "Server is not running."
+  else
+    server.kill
+  end
+end
+
+def viewServer(servers)
+  puts "Not yet implemented."
 end
 
 def printMenu()
@@ -139,13 +197,14 @@ end
 SERVERS = loadProfile(OPTIONS.profile_file)
 
 #-------------------------init done-------------------
-puts SERVERS
 
+#-------------------------batch-----------------------
 if(OPTIONS.backup?)
   output "Backing up..."
   
 end
 
+#-------------------------interactive-----------------
 stop = false
 while(!stop)
   printMenu()

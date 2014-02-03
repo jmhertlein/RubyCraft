@@ -21,4 +21,29 @@ class Server
     @server_dir = server_dir
     @backup_dir = backup_dir
   end
+
+  def start()
+    Dir.chdir(@server_dir)
+    @screen_name = "mc-" + @server_name.gsub(" ", "-")
+    @pid = fork do
+      `screen -d -m -S #{@screen_name} java -jar craftbukkit.jar`
+    end
+  end
+
+  def halt()
+    `screen -S #{@screen_name} -X stuff 'stop\n'`
+  end
+
+  def kill
+    Process.kill(9, @pid)
+  end
+
+  def isRunning?
+    begin
+      Process.getpgid(@pid)
+      return true
+    rescue Errno::ESRCH
+      return false
+    end
+  end
 end
