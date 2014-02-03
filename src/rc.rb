@@ -19,6 +19,7 @@ require 'optparse'
 require 'ostruct'
 require 'yaml'
 require 'fileutils'
+require 'pathname'
 
 require_relative 'Server.rb'
 
@@ -138,6 +139,19 @@ def haltServer(servers)
   end
 end
 
+def backupServer(servers)
+  puts "Server name:"
+  server = SERVERS[gets.chomp]
+
+  if(server.nil?)
+    puts "Unknown server."
+  else
+    puts "Backing up..."
+    server.backup
+    puts "Done backing up."
+  end
+end
+
 def killServer(servers)
   puts "Name of server to kill:"
   server = gets.chomp
@@ -165,6 +179,7 @@ def printMenu()
   puts "(h)alt a server"
   puts "(k)ill a server"
   puts "(l)ist servers"
+  puts "(b)ackup a server's worlds"
   puts "(v)iew a server"
   puts "e(x)it"
   puts "Print (help)"
@@ -206,8 +221,8 @@ end
 
 #-------------------------interactive-----------------
 stop = false
+printMenu()
 while(!stop)
-  printMenu()
   char = gets.chomp
   case char
     when "r"
@@ -226,6 +241,8 @@ while(!stop)
       listServers(SERVERS)
     when "l"
       listServers(SERVERS)
+    when "b"
+      backupServer(SERVERS)
     when "x"
       stop = true
     when "help"

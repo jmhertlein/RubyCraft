@@ -12,6 +12,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+require 'find'
 
 class Server
   attr_accessor :server_name, :server_dir, :backup_dir, :screen_name, :pid
@@ -41,5 +42,23 @@ class Server
       return false
     end
     return !(`screen -ls`.scan(/#{@screen_name}/).empty?)
+  end
+
+  def backup()
+    getWorldDirs().each do |worldDir|
+      backupFileName = "#{worldDir.basename}_#{DateTime.now.to_s}.zip"
+      backupFilePathname = Pathname.new(@backup_dir) + backupFileName
+      `zip -9 -r #{backupFilePathname.realdirpath} #{worldDir.realpath}`
+    end
+  end
+
+  def getWorldDirs()
+    worlds = []
+    Dir.glob("#{@server_dir}/**/level.dat").each do |dat|
+      serverFolder = Pathname.new(dat).parent  
+      worlds << serverFolder
+    end
+
+    return worlds
   end
 end
