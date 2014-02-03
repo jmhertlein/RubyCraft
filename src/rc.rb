@@ -105,9 +105,14 @@ def restartServer(servers)
 end
 
 def listServers(servers)
-  puts servers
   servers.each do |key, value|
-    puts key
+    if(value.isRunning?)
+      status = "up"
+    else
+      status = "down"
+    end
+
+    puts "#{value.server_name} | #{status}"
   end
 end
 
@@ -256,6 +261,8 @@ elsif(OPTIONS.interactive)
   stop = false
   printMenu()
   while(!stop)
+    print ">"
+    STDOUT.flush
     char = gets.chomp
     case char
       when "r"
