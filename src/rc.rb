@@ -35,13 +35,9 @@ def parseOptions(args)
   opt_parser = OptionParser.new do |opts|
     opts.banner = USAGE
 
-    opts.on("-b=SERVER_DIR", "--backup=SERVER_DIR", "Backup the specified server.") do |b|
-      options.backup = b.nil?
-      options.server_dir = b
-    end
-
-    opts.on("-o=OUTPUT_DIR", "--output-dir=OUTPUT_DIR", "Directory the server should backup to.") do |o|
-      options.output_dir = o
+    opts.on("-b=SERVER", "--backup=SERVER", "Backup a registered server.") do |b|
+      options.backup = !b.nil?
+      options.server = b
     end
     
     opts.on("-p=PROFILE_FILE", "--profile=PROFILE_FILE", "File to which persistent state will be written. (Default: ~/.rcraft_profile") do |p|
@@ -158,7 +154,7 @@ def killServer(servers)
   server = servers[server]
 
   if(server.nil?)
-    puts "Unknonw server."
+    puts "Unknown server."
   elsif(server.isRunning?)
     puts "Server is not running."
   else
@@ -191,7 +187,7 @@ end
 OPTIONS = parseOptions(ARGV)
 
 def output(msg)
-  if(OPTIONS.verbose?)
+  if(OPTIONS.verbose)
     puts msg
   end
 end
@@ -214,58 +210,57 @@ SERVERS = loadProfile(OPTIONS.profile_file)
 #-------------------------init done-------------------
 
 #-------------------------batch-----------------------
-if(OPTIONS.backup?)
-  output "Backing up..."
-  
-end
-
-#-------------------------interactive-----------------
-stop = false
-printMenu()
-while(!stop)
-  char = gets.chomp
-  case char
-    when "r"
-      registerServer(SERVERS)
-    when "u"
-      unregisterServer(SERVERS)
-    when "s"
-      startServer(SERVERS)
-    when "h"
-      haltServer(SERVERS)
-    when "k"
-      killServer(SERVERS)
-    when "v"
-      viewServer(SERVERS)
-    when "ls"
-      listServers(SERVERS)
-    when "l"
-      listServers(SERVERS)
-    when "b"
-      backupServer(SERVERS)
-    when "x"
-      stop = true
-    when "help"
-      printMenu()
-    else
-      puts "Invalid command: \"#{char}\"."
-      printMenu()
+if(OPTIONS.backup)
+  server = SERVERS[OPTIONS.server]
+  if(server.nil?)
+    puts "Unknown server: " + OPTIONS.server
+    exit
   end
-end
 
-#  Dir.chdir(SERVER_DIR)
-#  while (true) 
-#    pid = fork do
-#      `screen -d -m -S mc java -jar craftbukkit.jar`
-#    end
-#    if(!OPTIONS.persistent)
-#      break
-#    elsif 
-#      output "Waiting on PID #{pid} (because -p specified)"
-#      wait(pid)
-#      output "Restarting..."
-#    end 
-#  end #while
+  output "Backing up server: " + server.to_s
+  output "Detected worlds: "
+  server.getWorldDirs.each do |d|
+    output d.basename
+  end
+
+  output "Backing up..."
+  server.backup
+  output "Backed up."
+#-------------------------interactive-----------------
+elsif(OPTIONS.interactive)
+  stop = false
+  printMenu()
+  while(!stop)
+    char = gets.chomp
+    case char
+      when "r"
+        registerServer(SERVERS)
+      when "u"
+        unregisterServer(SERVERS)
+      when "s"
+        startServer(SERVERS)
+      when "h"
+        haltServer(SERVERS)
+      when "k"
+        killServer(SERVERS)
+      when "v"
+        viewServer(SERVERS)
+      when "ls"
+        listServers(SERVERS)
+      when "l"
+        listServers(SERVERS)
+      when "b"
+        backupServer(SERVERS)
+      when "x"
+        stop = true
+      when "help"
+        printMenu()
+      else
+        puts "Invalid command: \"#{char}\"."
+        printMenu()
+    end #case
+  end #while
+end #if
 
 #---------------------shutdown-----------------------
 writeProfile(OPTIONS.profile_file, SERVERS)

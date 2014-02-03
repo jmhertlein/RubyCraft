@@ -61,4 +61,8 @@ class Server
 
     return worlds
   end
+
+  def to_s
+    return "[#{@server_name} (Location: #{@server_dir}) (Backup: #{@backup_dir})]"
+  end
 end
