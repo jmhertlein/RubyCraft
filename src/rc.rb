@@ -169,7 +169,7 @@ def killServer(servers)
 
   if(server.nil?)
     puts "Unknown server."
-  elsif(server.isRunning?)
+  elsif(!server.isRunning?)
     puts "Server is not running."
   else
     server.kill
@@ -177,7 +177,17 @@ def killServer(servers)
 end
 
 def viewServer(servers)
-  puts "Not yet implemented."
+  puts "Name of server to view:"
+  server = gets.chomp
+  server = servers[server]
+
+  if(server.nil?)
+    puts "Unknown server."
+  elsif(!server.isRunning?)
+    puts "Server is not running."
+  else
+    exec("screen -x #{server.screen_name}")
+  end
 end
 
 def printMenu()
@@ -259,6 +269,7 @@ elsif(OPTIONS.interactive)
       when "k"
         killServer(SERVERS)
       when "v"
+        writeProfile(OPTIONS.profile_file, SERVERS)
         viewServer(SERVERS)
       when "ls"
         listServers(SERVERS)
