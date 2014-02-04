@@ -4,10 +4,11 @@
 
 ### Batch
 
-    rc -i                  # launch interactively 
-    rc -b -s notchland     # backup the server named 'notchland'
-    rc -p=10 -s notchland  # prune backups of the server named 'notchland' older than 10 days
-    rc --help              # print help
+    rc -i                       # launch interactively 
+    rc -b -s notchland          # backup the server named 'notchland'
+    rc --prune=10 -s notchland  # prune backups of the server named 'notchland' older than 10 days
+    rc -p=/path/to/profile ...  # specify a profile location other than ~/.rcraft_profile
+    rc --help                   # print help
 
 ### Interactive
 
