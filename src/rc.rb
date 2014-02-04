@@ -303,6 +303,11 @@ if(OPTIONS.batch)
   elsif(OPTIONS.prune)
     output "Pruning server: #{server.to_s}"
 
+    if(OPTIONS.prune_days <= 0)
+      puts "Error: can only prune backups >= 1 day old. (You specified #{OPTIONS.prune_days})"
+      exit
+    end
+
     pending = server.getBackupPathnamesOlderThan(OPTIONS.prune_days)
     output "===========PENDING DELETIONS====================="
     pending.each do |pend|
