@@ -15,7 +15,7 @@
 require 'find'
 
 class Server
-  attr_accessor :server_name, :server_dir, :backup_dir, :screen_name, :pid, :server_jar
+  attr_accessor :server_name, :server_dir, :backup_dir, :screen_name, :pid, :server_jar, :java_args
 
   def initialize(server_name, server_dir, backup_dir)
     @server_name = server_name
@@ -26,7 +26,7 @@ class Server
   def start()
     Dir.chdir(@server_dir)
     @screen_name = "mc-" + @server_name.gsub(" ", "-")
-    @pid = spawn("screen -d -m -S #{@screen_name} java -jar #{@server_jar}")
+    @pid = spawn("screen -d -m -S #{@screen_name} java #{@java_args} -jar #{@server_jar}")
     while(!self.isRunning?)
       sleep 1
     end

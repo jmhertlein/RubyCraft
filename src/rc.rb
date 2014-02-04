@@ -122,6 +122,16 @@ def registerServer(servers)
     puts "Selected #{jars[num].basename}"
     s.server_jar = jars[num].basename
   end
+
+  jvmargs = "-Xmx1G"
+  puts "Default JVM arguments are: #{jvmargs}"
+  puts "Enter custom arguments or press enter to accept default."
+  newargs = gets.chomp
+  if(!newargs.empty?)
+    jvmargs = newargs
+  end
+  puts "JVM arguments set to: #{jvmargs}"
+  s.java_args = jvmargs
 end
 
 def restartServer(servers)
