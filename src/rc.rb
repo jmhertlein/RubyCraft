@@ -108,6 +108,20 @@ def registerServer(servers)
 
   s = Server.new(server_name, server_dir, backup_dir)
   servers[server_name] = s
+
+  jars = s.getPossibleServerJarPathnames
+  if(jars.size == 1)
+    s.server_jar = jars[0].basename
+    puts "Selected #{jars[0].basename}"
+  else
+    puts "Found more than one jar in #{server_dir}. Which number is the jar to start the server? (default=0)"
+    jars.each_with_index do |jar, n|
+      puts "    #{n}. #{jar.basename}"
+    end
+    num = gets.chomp.to_i
+    puts "Selected #{jars[num].basename}"
+    s.server_jar = jars[num].basename
+  end
 end
 
 def restartServer(servers)

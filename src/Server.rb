@@ -15,7 +15,7 @@
 require 'find'
 
 class Server
-  attr_accessor :server_name, :server_dir, :backup_dir, :screen_name, :pid
+  attr_accessor :server_name, :server_dir, :backup_dir, :screen_name, :pid, :server_jar
 
   def initialize(server_name, server_dir, backup_dir)
     @server_name = server_name
@@ -26,7 +26,7 @@ class Server
   def start()
     Dir.chdir(@server_dir)
     @screen_name = "mc-" + @server_name.gsub(" ", "-")
-    @pid = spawn("screen -d -m -S #{@screen_name} java -jar craftbukkit.jar")
+    @pid = spawn("screen -d -m -S #{@screen_name} java -jar #{@server_jar}")
     spawn("screen -S #{@screen_name} -p 0 -X multiuser on")
   end
 
@@ -84,6 +84,10 @@ class Server
     getBackupPathnamesOlderThan(days).each do |oldBackup|
       oldBackup.delete
     end
+  end
+
+  def getPossibleServerJarPathnames()
+    return Pathname.glob("#{@server_dir}/*.jar")
   end
 
   def to_s
