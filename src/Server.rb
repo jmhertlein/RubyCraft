@@ -42,10 +42,6 @@ class Server
     self.start
   end
 
-  def kill
-    Process.kill(9, @pid)
-  end
-
   def isRunning?
     if(@pid.nil?)
       return false

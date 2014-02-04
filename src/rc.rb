@@ -187,20 +187,6 @@ def backupServer(servers)
   end
 end
 
-def killServer(servers)
-  puts "Name of server to kill:"
-  server = gets.chomp
-  server = servers[server]
-
-  if(server.nil?)
-    puts "Unknown server."
-  elsif(!server.isRunning?)
-    puts "Server is not running."
-  else
-    server.kill
-  end
-end
-
 def viewServer(servers)
   puts "Name of server to view:"
   server = gets.chomp
@@ -252,7 +238,6 @@ def printMenu()
   puts "(s)tart a server"
   puts "r(e)start a server"
   puts "(h)alt a server"
-  puts "(k)ill a server"
   puts "(l)ist servers"
   puts "(b)ackup a server's worlds"
   puts "(p)rune backups of a server's worlds"
@@ -349,8 +334,6 @@ elsif(OPTIONS.interactive)
         startServer(SERVERS)
       when "h"
         haltServer(SERVERS)
-      when "k"
-        killServer(SERVERS)
       when "v"
         writeProfile(OPTIONS.profile_file, SERVERS)
         viewServer(SERVERS)

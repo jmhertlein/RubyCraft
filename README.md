@@ -17,8 +17,6 @@
     s - Start a server      - starts the server running in a new GNU screen session in multiuser mode
     e - Restart a server    - halts a server, then starts it again.
     h - Halt a server       - cleanly stops the server and terminates the GNU screen
-    k - Kill a server       - Sends POSIX signal 9 (SIGKILL) to the GNU screen session 
-                                that the server is in
     l - List servers        - Lists all servers registered with rc, as well as their status 
                                 (up = server is running, down = server is not running)
     b - Backup a server     - Backs up a server's worlds to its backup directory
