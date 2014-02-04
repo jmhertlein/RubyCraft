@@ -41,6 +41,7 @@ def parseOptions(args)
   #profile
   options.profile_file = ENV['HOME'] + "/.rcraft_profile"
 
+  #options parsing
   opt_parser = OptionParser.new do |opts|
     opts.banner = USAGE
 
@@ -302,6 +303,7 @@ if(OPTIONS.batch)
     exit
   end
 
+  #------------------backup------------------------
   if(OPTIONS.backup)
     output "Backing up server: " + server.to_s
     output "Detected worlds: "
@@ -312,6 +314,7 @@ if(OPTIONS.batch)
     output "Backing up..."
     server.backup
     output "Backed up."
+  #----------------prune---------------------------
   elsif(OPTIONS.prune)
     output "Pruning server: #{server.to_s}"
 

@@ -4,9 +4,10 @@
 
 ### Batch
 
-    rc -i          # launch interactively 
-    rc -b server   # backup the specified server
-    rc --help      # print help
+    rc -i                  # launch interactively 
+    rc -b -s notchland     # backup the server named 'notchland'
+    rc -p=10 -s notchland  # prune backups of the server named 'notchland' older than 10 days
+    rc --help              # print help
 
 ### Interactive
 
@@ -21,6 +22,7 @@
     l - List servers        - Lists all servers registered with rc, as well as their status 
                                 (up = server is running, down = server is not running)
     b - Backup a server     - Backs up a server's worlds to its backup directory
+    p - Prune backups       - Remove backups of a server that are older than a certain number of days
     v - View a server       - exits rc and attaches you to the GNU screen in which the specified 
                                 server is running
     x - Exit                - Exits rc. (Does not halt servers- if they're running, they keep running).
