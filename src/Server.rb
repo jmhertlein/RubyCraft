@@ -71,6 +71,18 @@ class Server
     return worlds
   end
 
+  def pruneBackups(days)
+    backups = Pathname.new @backup_dir
+    
+    Pathname.glob(backups, "*.zip").each do |zipfile|
+      timestamp = zipfile.basename.chomp(".zip").split("_")[-1]
+      date = DateTime.parse timestamp
+      if((DateTime.now.to_date - date.to_date).to_int > days)
+        zipfile.delete
+      end
+    end
+  end
+
   def to_s
     return "[#{@server_name} (Location: #{@server_dir}) (Backup: #{@backup_dir})]"
   end
