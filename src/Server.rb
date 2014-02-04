@@ -71,15 +71,22 @@ class Server
     return worlds
   end
 
-  def pruneBackups(days)
+  def getBackupPathnamesOlderThan(days)
     backups = Pathname.new @backup_dir
-    
+    oldFiles = []
     Pathname.glob(backups, "*.zip").each do |zipfile|
       timestamp = zipfile.basename.chomp(".zip").split("_")[-1]
       date = DateTime.parse timestamp
       if((DateTime.now.to_date - date.to_date).to_int > days)
-        zipfile.delete
+        oldFiles << zipfile
       end
+    end
+    return oldFiles
+  end
+
+  def pruneBackups(days)
+    getBackupPathnamesOlderThan(days).each do |oldBackup|
+      oldBackup.delete
     end
   end
 

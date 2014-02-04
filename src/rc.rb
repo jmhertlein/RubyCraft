@@ -195,6 +195,30 @@ def viewServer(servers)
   end
 end
 
+def pruneBackups(SERVERS)
+  puts "Name of server whose backups will be pruned:"
+  server = gets.chomp
+  server = servers[server]
+
+  puts "Delete backups older than how many days?"
+  days = gets
+  
+  pending = server.getBackupPathnamesOlderThan(days)
+  puts "===========PENDING DELETIONS====================="
+  pending.each do |pend|
+    puts pend.realpath
+  end
+  puts "================================================="
+
+  puts "This will delete #{pending.size} files. Procees? (y/N)"
+
+  if(server.nil?)
+    puts "Unknown server."
+  else
+    server.pruneBackups(days)
+  end
+end
+
 def printMenu()
   puts "Usage: [char] [argument]"
   puts "======================="
