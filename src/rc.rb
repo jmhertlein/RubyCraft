@@ -27,17 +27,26 @@ USAGE = "Usage: rc [OPTIONS]"
 
 def parseOptions(args)
   options = OpenStruct.new
-  options.backup = false
+
+  #modes
   options.interactive = false
+  options.batch = false
   options.verbose = false
+  
+  #batch options
+  options.backup = false
+  options.prune = false
+  options.server = nil
+  
+  #profile
   options.profile_file = ENV['HOME'] + "/.rcraft_profile"
 
   opt_parser = OptionParser.new do |opts|
     opts.banner = USAGE
 
-    opts.on("-b=SERVER", "--backup=SERVER", "Backup a registered server.") do |b|
+    opts.on("-b", "--backup", "Backup a registered server.") do |b|
+      options.batch = true
       options.backup = !b.nil?
-      options.server = b
     end
     
     opts.on("-p=PROFILE_FILE", "--profile=PROFILE_FILE", "File to which persistent state will be written. (Default: ~/.rcraft_profile") do |p|
@@ -52,6 +61,16 @@ def parseOptions(args)
       options.verbose = v
     end
 
+    opts.on("--prune=DAYS", "Prune backups older than DAYS days") do |prune|
+      options.batch = true
+      options.prune = true
+      options.prune_days = prune.to_i
+    end
+
+    opts.on("-s=NAME", "--server=NAME", "Specify the server to operate on in batch mode") do |s|
+      options.batch = true
+      options.server = s
+    end
   end.parse!
     
   return options
@@ -254,14 +273,14 @@ end
 
 output "Options: #{OPTIONS}"
 
-if(!OPTIONS.backup && !OPTIONS.interactive)
+if(!OPTIONS.batch && !OPTIONS.interactive)
   puts "No actions specified, nothing to do."
   exit
 end
 
-if(OPTIONS.backup && OPTIONS.interactive)
-  puts "Both backup and interactive mode requested, but this isn't supported."
-  puts "Please either backup or run interactively, but not both at once."
+if(OPTIONS.batch && OPTIONS.interactive)
+  puts "Both batch and interactive modes requested, but this isn't supported."
+  puts "Please either use bath or interactive mode, but not both at once."
   exit
 end
 
@@ -270,22 +289,46 @@ SERVERS = loadProfile(OPTIONS.profile_file)
 #-------------------------init done-------------------
 
 #-------------------------batch-----------------------
-if(OPTIONS.backup)
+if(OPTIONS.batch)
+  server = OPTIONS.server
+  if(server.nil?)
+    puts "No server specified. Specify one with --server."
+    exit
+  end
+
   server = SERVERS[OPTIONS.server]
   if(server.nil?)
     puts "Unknown server: " + OPTIONS.server
     exit
   end
 
-  output "Backing up server: " + server.to_s
-  output "Detected worlds: "
-  server.getWorldDirs.each do |d|
-    output d.basename
-  end
+  if(OPTIONS.backup)
+    output "Backing up server: " + server.to_s
+    output "Detected worlds: "
+    server.getWorldDirs.each do |d|
+      output d.basename
+    end
 
-  output "Backing up..."
-  server.backup
-  output "Backed up."
+    output "Backing up..."
+    server.backup
+    output "Backed up."
+  elsif(OPTIONS.prune)
+    output "Pruning server: #{server.to_s}"
+
+    pending = server.getBackupPathnamesOlderThan(OPTIONS.prune_days)
+    output "===========PENDING DELETIONS====================="
+    pending.each do |pend|
+      output pend.realpath
+    end
+    output "================================================="
+
+    output "This will delete #{pending.size} files."
+    output "Pruning..."
+    server.pruneBackups(OPTIONS.prune_days)
+    output "Done pruning."
+  else
+    puts "No batch operations specified, nothing to do."
+  end
 #-------------------------interactive-----------------
 elsif(OPTIONS.interactive)
   stop = false
@@ -331,4 +374,4 @@ end #if
 
 #---------------------shutdown-----------------------
 writeProfile(OPTIONS.profile_file, SERVERS)
-output "Done."
+output "rc exiting."
