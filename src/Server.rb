@@ -74,8 +74,8 @@ class Server
   def getBackupPathnamesOlderThan(days)
     backups = Pathname.new @backup_dir
     oldFiles = []
-    Pathname.glob(backups, "*.zip").each do |zipfile|
-      timestamp = zipfile.basename.chomp(".zip").split("_")[-1]
+    Pathname.glob("#{backups.realpath.to_s}/*.zip").each do |zipfile|
+      timestamp = zipfile.basename.to_s.chomp(".zip").split("_")[-1]
       date = DateTime.parse timestamp
       if((DateTime.now.to_date - date.to_date).to_int > days)
         oldFiles << zipfile

@@ -195,13 +195,13 @@ def viewServer(servers)
   end
 end
 
-def pruneBackups(SERVERS)
+def pruneBackups(servers)
   puts "Name of server whose backups will be pruned:"
   server = gets.chomp
   server = servers[server]
 
   puts "Delete backups older than how many days?"
-  days = gets
+  days = gets.chomp.to_i
   
   pending = server.getBackupPathnamesOlderThan(days)
   puts "===========PENDING DELETIONS====================="
@@ -210,12 +210,17 @@ def pruneBackups(SERVERS)
   end
   puts "================================================="
 
-  puts "This will delete #{pending.size} files. Procees? (y/N)"
+  puts "This will delete #{pending.size} files. Proceed? (y/N)"
+  resp = gets.chomp
 
   if(server.nil?)
     puts "Unknown server."
+  elsif(resp != "y")
+    puts "Deletion aborted."
   else
+    puts "Deleting..."
     server.pruneBackups(days)
+    puts "Deleted."
   end
 end
 
@@ -230,6 +235,7 @@ def printMenu()
   puts "(k)ill a server"
   puts "(l)ist servers"
   puts "(b)ackup a server's worlds"
+  puts "(p)rune backups of a server's worlds"
   puts "(v)iew a server"
   puts "e(x)it"
   puts "Print (help)"
@@ -308,6 +314,8 @@ elsif(OPTIONS.interactive)
         listServers(SERVERS)
       when "b"
         backupServer(SERVERS)
+      when "p"
+        pruneBackups(SERVERS)
       when "e"
         restartServer(SERVERS)
       when "x"
