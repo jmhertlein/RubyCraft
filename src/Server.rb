@@ -63,7 +63,7 @@ class Server
 
   def getWorldDirs()
     worlds = []
-    Dir.glob("#{@server_dir}/**/level.dat").each do |dat|
+    Dir.glob("#{@server_dir}/*/level.dat").each do |dat|
       serverFolder = Pathname.new(dat).parent  
       worlds << serverFolder
     end
