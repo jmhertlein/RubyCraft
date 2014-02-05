@@ -123,7 +123,7 @@ def registerServer(servers)
     s.server_jar = jars[num].basename
   end
 
-  jvmargs = "-Xmx1G"
+  jvmargs = "-Xmx1G -XX:MaxPermSize=128M"
   puts "Default JVM arguments are: #{jvmargs}"
   puts "Enter custom arguments or press enter to accept default."
   newargs = gets.chomp
