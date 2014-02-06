@@ -37,6 +37,7 @@ def parseOptions(args)
   options.backup = false
   options.prune = false
   options.server = nil
+  options.restart = false
   
   #profile
   options.profile_file = ENV['HOME'] + "/.rcraft_profile"
@@ -71,6 +72,11 @@ def parseOptions(args)
     opts.on("-s=NAME", "--server=NAME", "Specify the server to operate on in batch mode") do |s|
       options.batch = true
       options.server = s
+    end
+
+    opts.on("-r", "--restart", "Restart a server.") do |prune|
+      options.batch = true
+      options.restart = true
     end
   end.parse!
     
@@ -343,6 +349,10 @@ if(OPTIONS.batch)
     output "Pruning..."
     server.pruneBackups(OPTIONS.prune_days)
     output "Done pruning."
+  elsif(OPTIONS.restart)
+    output "Restarting..."
+    OPTIONS.server.restart
+    output "Restarted."
   else
     puts "No batch operations specified, nothing to do."
   end
