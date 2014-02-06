@@ -38,7 +38,7 @@ class Server
   end
 
   def puts(msg)
-    spawn("screen -S #{@screen_name} -p 0 -X stuff '\n#{msg}\n'")
+    spawn("screen -S #{@screen_name} -p 0 -X stuff '\nsay #{msg}\n'")
   end
 
   def restart()

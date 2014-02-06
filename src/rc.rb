@@ -362,7 +362,7 @@ if(OPTIONS.batch)
     if(OPTIONS.warn)
       output "Issuing warning and waiting #{OPTIONS.warn_time} seconds."
       server.puts "Restarting in #{OPTIONS.warn_time} seconds."
-      sleep(Options.warn_time)
+      sleep(OPTIONS.warn_time)
     end
     server.restart
     output "Restarted."
