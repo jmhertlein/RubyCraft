@@ -8,7 +8,8 @@
     rc -b -s notchland          # backup the server named 'notchland'
     rc --prune=10 -s notchland  # prune backups of the server named 'notchland' older than 10 days
     rc -p=/path/to/profile ...  # specify a profile location other than ~/.rcraft_profile
-    rc --help                   # print help
+    rc -w 30 -r -s notchland    # restart notchland with a 30 second warning printed to players
+    rc --help                   # print help, and more options
 
 ### Interactive
 
