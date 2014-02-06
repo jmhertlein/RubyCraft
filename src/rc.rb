@@ -351,7 +351,7 @@ if(OPTIONS.batch)
     output "Done pruning."
   elsif(OPTIONS.restart)
     output "Restarting..."
-    OPTIONS.server.restart
+    server.restart
     output "Restarted."
   else
     puts "No batch operations specified, nothing to do."
