@@ -37,6 +37,10 @@ class Server
     spawn("screen -S #{@screen_name} -p 0 -X stuff '\nstop\n'")
   end
 
+  def puts(msg)
+    spawn("screen -S #{@screen_name} -p 0 -X stuff '\n#{msg}\n'")
+  end
+
   def restart()
     self.halt()
     while(self.isRunning?)

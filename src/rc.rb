@@ -38,6 +38,7 @@ def parseOptions(args)
   options.prune = false
   options.server = nil
   options.restart = false
+  options.warn = false
   
   #profile
   options.profile_file = ENV['HOME'] + "/.rcraft_profile"
@@ -74,9 +75,15 @@ def parseOptions(args)
       options.server = s
     end
 
-    opts.on("-r", "--restart", "Restart a server.") do |prune|
+    opts.on("-r", "--restart", "Restart a server.") do |r|
       options.batch = true
       options.restart = true
+    end
+
+    opts.on("-w=SECS", "--warn=SECS", "Warn server SECS seconds before an action, if applicable.") do |w|
+      options.batch = true
+      options.warn = true
+      options.warn_time = w.to_i
     end
   end.parse!
     
@@ -349,8 +356,14 @@ if(OPTIONS.batch)
     output "Pruning..."
     server.pruneBackups(OPTIONS.prune_days)
     output "Done pruning."
+#------------------------restart-------------------------
   elsif(OPTIONS.restart)
     output "Restarting..."
+    if(OPTIONS.warn)
+      output "Issuing warning and waiting #{OPTIONS.warn_time} seconds."
+      server.puts "Restarting in #{OPTIONS.warn_time} seconds."
+      sleep(Options.warn_time)
+    end
     server.restart
     output "Restarted."
   else
