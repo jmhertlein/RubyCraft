@@ -59,7 +59,7 @@ class Server
   def backup()
     getWorldDirs().each do |worldDir|
       worldName = worldDir.basename
-      backupFileName = "#{worldName}_#{DateTime.now.to_s}.zip"
+      backupFileName = "#{worldName}_#{Date.today.to_s}.zip"
       worldBackupPathname = Pathname.new(@backup_dir) + worldName
       worldBackupPathname.mkpath
       backupFilePathname = worldBackupPathname +  backupFileName
@@ -83,11 +83,11 @@ class Server
     Pathname.glob("#{backups.realpath.to_s}/**/*.zip").each do |zipfile|
       timestamp = zipfile.basename.to_s.chomp(".zip").split("_")[-1]
       begin
-        date = DateTime.parse timestamp
+        date = Date.parse timestamp
       rescue
         next
       end
-      if((DateTime.now.to_date - date.to_date).to_int > days)
+      if((Date.today - date).to_int > days)
         oldFiles << zipfile
       end
     end
