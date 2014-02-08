@@ -58,8 +58,11 @@ class Server
 
   def backup()
     getWorldDirs().each do |worldDir|
-      backupFileName = "#{worldDir.basename}_#{DateTime.now.to_s}.zip"
-      backupFilePathname = Pathname.new(@backup_dir) + backupFileName
+      worldName = worldDir.basename
+      backupFileName = "#{worldName}_#{DateTime.now.to_s}.zip"
+      worldBackupPathname = Pathname.new(@backup_dir) + worldName
+      worldBackupPathname.mkpath
+      backupFilePathname = worldBackupPathname +  backupFileName
       `zip -9 -r #{backupFilePathname.realdirpath} #{worldDir.realpath}`
     end
   end
