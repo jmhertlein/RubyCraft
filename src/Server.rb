@@ -82,7 +82,7 @@ class Server
     oldFiles = []
     Pathname.glob("#{backups.realpath.to_s}/**/*.zip").each do |zipfile|
       timestamp = zipfile.basename.to_s.chomp(".zip").split("_")[-1]
-      if(timestamp.empty?)
+      if(timestamp.empty? or timestamp == zipfile.basename.to_s.chomp(".zip"))
         next
       end
       begin
