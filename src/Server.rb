@@ -82,6 +82,9 @@ class Server
     oldFiles = []
     Pathname.glob("#{backups.realpath.to_s}/**/*.zip").each do |zipfile|
       timestamp = zipfile.basename.to_s.chomp(".zip").split("_")[-1]
+      if(timestamp.empty?)
+        next
+      end
       begin
         date = Date.parse timestamp
       rescue
