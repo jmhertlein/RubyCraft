@@ -41,7 +41,7 @@ def parseOptions(args)
   options.warn = false
   
   #profile
-  options.profile_file = ENV['HOME'] + "/.rcraft_profile"
+  options.profile_file = ENV['HOME'] + "/.config/rcraft_profile"
 
   #options parsing
   opt_parser = OptionParser.new do |opts|
