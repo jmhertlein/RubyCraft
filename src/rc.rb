@@ -290,7 +290,10 @@ OPTIONS = parseOptions(ARGV)
 
 lockfile = Pathname.new "/tmp/rcraft-#{ENV['USER']}.pid"
 if(lockfile.exist?)
-  puts "Your user is already running an instance of rcraft. (PID: #{})"
+  pid = "unknown"
+  lockfile.open {|f| pid = f.read }
+  puts "Your user is already running an instance of rcraft. (PID: #{pid})"
+  puts "If this pid is dead, remove the file #{lockfile} to quash this message."
   exit(1)
 else
   FileUtils.touch(lockfile)
