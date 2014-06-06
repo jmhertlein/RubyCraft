@@ -288,6 +288,17 @@ end
 
 OPTIONS = parseOptions(ARGV)
 
+lockfile = Pathname.new "/tmp/rcraft-#{ENV['USER']}.pid"
+if(lockfile.exist?)
+  puts "Your user is already running an instance of rcraft. (PID: #{})"
+  exit(1)
+else
+  FileUtils.touch(lockfile)
+  lockfile.open "w" do |stream|
+    stream.write Process.pid
+  end
+end
+
 def output(msg)
   if(OPTIONS.verbose)
     puts msg
@@ -412,4 +423,5 @@ end #if
 
 #---------------------shutdown-----------------------
 writeProfile(OPTIONS.profile_file, SERVERS)
+lockfile.unlink
 output "rc exiting."
