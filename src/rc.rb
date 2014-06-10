@@ -41,7 +41,9 @@ def parseOptions(args)
   options.warn = false
   
   #profile
-  options.profile_file = ENV['HOME'] + "/.config/rcraft_profile"
+  options.profile_dir = File.join(Dir.home, ".config", "rubycraft")
+  options.servers_file = File.join(options.profile_dir, "servers.yml")
+  options.config_file = File.join(options.profile_dir, "config.yml")
 
   #options parsing
   opt_parser = OptionParser.new do |opts|
@@ -53,7 +55,7 @@ def parseOptions(args)
     end
     
     opts.on("-p=PROFILE_FILE", "--profile=PROFILE_FILE", "File to which persistent state will be written. (Default: ~/.rcraft_profile") do |p|
-      options.profile_file = p
+      options.servers_file = p
     end
 
     opts.on("-i", "--interactive", "Launch interactive server manager.") do |i|
@@ -90,10 +92,11 @@ def parseOptions(args)
   return options
 end
 
-def loadProfile(profile_file) 
-  FileUtils.touch(profile_file)
+def loadProfile(servers_file) 
+  FileUtils.touch(servers_file)
 
-  file = File.open(profile_file)
+
+  file = File.open(servers_file)
   servers = YAML.load(file.read)
   if(!servers)
     servers = Hash.new
@@ -103,10 +106,32 @@ def loadProfile(profile_file)
   return servers
 end
 
-def writeProfile(profile_file, servers)
-  file = File.open(profile_file, 'w')
+def writeProfile(servers_file, servers)
+  file = File.open(servers_file, 'w')
   file.write(servers.to_yaml)
   file.close
+end
+
+def loadConfig config_file
+  FileUtils.touch(config_file)
+
+  config = false
+  File.open(config_file) { |f| config = YAML.load(f.read) }
+  unless config
+    config = Hash.new
+    config[:admin_emails] = [ENV['USER']]
+    File.open(config_file, 'w') {|f| f.write(config.to_yaml)}
+  end
+
+  return config
+end
+
+##
+# Prepare for shutdown
+def hcf(options, servers, lockfile)
+  writeProfile(options.servers_file, servers)
+  lockfile.unlink
+  output "rc exiting."
 end
 
 #------------------Menu Functions-----------------------------------
@@ -189,7 +214,7 @@ def startServer(servers)
   server = servers[server]
 
   if(server.nil?)
-    puts "Unknonw server."
+    puts "Unknown server."
   elsif(server.isRunning?)
     puts "Server is already running."
   else
@@ -287,6 +312,9 @@ end
 # ------------------------MAIN-------------------------
 
 OPTIONS = parseOptions(ARGV)
+p = Pathname.new OPTIONS.profile_dir
+p.mkpath
+CONFIG = loadConfig(OPTIONS.config_file)
 
 lockfile = Pathname.new "/tmp/rcraft-#{ENV['USER']}.pid"
 if(lockfile.exist?)
@@ -294,6 +322,13 @@ if(lockfile.exist?)
   lockfile.open {|f| pid = f.read }
   puts "Your user is already running an instance of rcraft. (PID: #{pid})"
   puts "If this pid is dead, remove the file #{lockfile} to quash this message."
+
+  unless CONFIG[:admin_emails].nil?
+    puts "Emailing admin..."
+    CONFIG[:admin_emails].each do |email|
+      spawn("echo 'rcraft error: already running!\noptions:\n\n#{OPTIONS}' | mail -s \"rubycraft error\" #{email}")
+    end
+  end
   exit(1)
 else
   FileUtils.touch(lockfile)
@@ -321,7 +356,7 @@ if(OPTIONS.batch && OPTIONS.interactive)
   exit
 end
 
-SERVERS = loadProfile(OPTIONS.profile_file)
+SERVERS = loadProfile(OPTIONS.servers_file)
 
 #-------------------------init done-------------------
 
@@ -401,7 +436,7 @@ elsif(OPTIONS.interactive)
       when "h"
         haltServer(SERVERS)
       when "v"
-        writeProfile(OPTIONS.profile_file, SERVERS)
+        hcf OPTIONS, SERVERS, lockfile
         viewServer(SERVERS)
       when "ls"
         listServers(SERVERS)
@@ -425,6 +460,4 @@ elsif(OPTIONS.interactive)
 end #if
 
 #---------------------shutdown-----------------------
-writeProfile(OPTIONS.profile_file, SERVERS)
-lockfile.unlink
-output "rc exiting."
+hcf OPTIONS, SERVERS, lockfile
