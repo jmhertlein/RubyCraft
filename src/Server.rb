@@ -37,16 +37,40 @@ class Server
     spawn("screen -S #{@screen_name} -p 0 -X stuff '\nstop\n'")
   end
 
-  def puts(msg)
+  def say(msg)
     spawn("screen -S #{@screen_name} -p 0 -X stuff '\nsay #{msg}\n'")
   end
 
   def restart()
-    self.halt()
-    while(self.isRunning?)
-      sleep 1
+    timeout = 60*5 #5 mins
+    maxTries = 3
+
+    started = false
+    tries = 0
+    while tries < maxTries && !started do
+      puts "try #{tries}"
+      puts "issuing halt"
+      self.halt
+      elapsed = 0
+      while(self.isRunning? && elapsed < timeout)
+        puts "not stopped (#{elapsed})"
+        sleep 1
+        elapsed += 1
+      end
+      puts "stopped or timed out"
+      if(!self.isRunning?)
+        puts "Starting"
+        self.start
+        started = true
+      else
+        puts "Wasn't stopped, retrying"
+        tries += 1
+      end
     end
-    self.start
+
+    if !started
+      puts "ERROR: COULDN'T STOP SERVER"
+    end
   end
 
   def isRunning?

@@ -347,12 +347,13 @@ output "Options: #{OPTIONS}"
 
 if(!OPTIONS.batch && !OPTIONS.interactive)
   puts "No actions specified, nothing to do."
+  hcf OPTIONS, SERVERS, lockfile
   exit
 end
 
 if(OPTIONS.batch && OPTIONS.interactive)
   puts "Both batch and interactive modes requested, but this isn't supported."
-  puts "Please either use bath or interactive mode, but not both at once."
+  puts "Please either use batch or interactive mode, but not both at once."
   exit
 end
 
@@ -363,6 +364,7 @@ SERVERS = loadProfile(OPTIONS.servers_file)
 #-------------------------batch-----------------------
 if(OPTIONS.batch)
   server = OPTIONS.server
+  output "Entering batch mode."
   if(server.nil?)
     puts "No server specified. Specify one with --server."
     exit
@@ -410,9 +412,11 @@ if(OPTIONS.batch)
     output "Restarting..."
     if(OPTIONS.warn)
       output "Issuing warning and waiting #{OPTIONS.warn_time} seconds."
-      server.puts "Restarting in #{OPTIONS.warn_time} seconds."
+      server.say "Restarting in #{OPTIONS.warn_time} seconds."
       sleep(OPTIONS.warn_time)
+      output "Done waiting"
     end
+    output "Issuing restart..."
     server.restart
     output "Restarted."
   else
