@@ -21,11 +21,11 @@ class Server
     @server_name = server_name
     @server_dir = server_dir
     @backup_dir = backup_dir
+    @screen_name = "mc-" + @server_name.gsub(" ", "-")
   end
 
   def start()
     Dir.chdir(@server_dir)
-    @screen_name = "mc-" + @server_name.gsub(" ", "-")
     spawn("screen -d -m -S #{@screen_name} java #{@java_args} -jar #{@server_jar}")
     while(!self.isRunning?)
       sleep 1
