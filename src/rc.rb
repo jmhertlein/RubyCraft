@@ -41,7 +41,6 @@ output "Options: #{OPTIONS}"
 
 if(!OPTIONS.batch && !OPTIONS.interactive)
   puts "No actions specified, nothing to do."
-  hcf OPTIONS, SERVERS
   exit
 end
 
