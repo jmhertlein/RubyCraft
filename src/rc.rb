@@ -144,7 +144,11 @@ elsif(OPTIONS.interactive)
   while(!stop)
     print ">"
     STDOUT.flush
-    char = gets.chomp
+    char = gets
+    unless char.nil?
+      char.chomp!
+    end
+
     case char
       when "r"
         registerServer(SERVERS)
@@ -171,6 +175,8 @@ elsif(OPTIONS.interactive)
         stop = true
       when "help"
         printMenu()
+      when nil
+        stop = true
       else
         puts "Invalid command: \"#{char}\"."
         printMenu()
