@@ -37,6 +37,14 @@ class Server
     spawn("screen -S #{@screen_name} -p 0 -X stuff '\nstop\n'")
   end
 
+  def sigint
+    spawn "kill -2 #{self.screen_pid}"
+  end
+
+  def sigkill
+    spawn "kill -9 #{self.screen_pid}"
+  end
+
   def say(msg)
     spawn("screen -S #{@screen_name} -p 0 -X stuff '\nsay #{msg}\n'")
   end
@@ -138,5 +146,14 @@ class Server
 
   def to_s
     return "[#{@server_name} (Location: #{@server_dir}) (Backup: #{@backup_dir})]"
+  end
+
+  def screen_pid
+    pid = `screen -ls`.scan(/(?<=^\t)[0-9]+(?=\.#{@screen_name}.*$)/).to_i
+    if pid == 0
+      return -1
+    else
+      return pid
+    end
   end
 end
