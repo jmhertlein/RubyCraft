@@ -128,9 +128,8 @@ end
 
 ##
 # Prepare for shutdown
-def hcf(options, servers, lockfile)
-  writeProfile(options.servers_file, servers)
-  lockfile.unlink
+def hcf(options, servers)
+  writeProfile(options.servers_file, servers) unless servers.nil?
   output "rc exiting."
 end
 

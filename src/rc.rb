@@ -31,27 +31,6 @@ p = Pathname.new OPTIONS.profile_dir
 p.mkpath
 CONFIG = loadConfig(OPTIONS.config_file)
 
-lockfile = Pathname.new "/tmp/rcraft-#{ENV['USER']}.pid"
-if(lockfile.exist?)
-  pid = "unknown"
-  lockfile.open {|f| pid = f.read }
-  puts "Your user is already running an instance of rcraft. (PID: #{pid})"
-  puts "If this pid is dead, remove the file #{lockfile} to quash this message."
-
-  unless CONFIG[:admin_emails].nil?
-    puts "Emailing admin..."
-    CONFIG[:admin_emails].each do |email|
-      spawn("echo 'rcraft error: already running!\noptions:\n\n#{OPTIONS}' | mail -s \"rubycraft error\" #{email}")
-    end
-  end
-  exit(1)
-else
-  FileUtils.touch(lockfile)
-  lockfile.open "w" do |stream|
-    stream.write Process.pid
-  end
-end
-
 def output(msg)
   if(OPTIONS.verbose)
     puts msg
@@ -62,7 +41,7 @@ output "Options: #{OPTIONS}"
 
 if(!OPTIONS.batch && !OPTIONS.interactive)
   puts "No actions specified, nothing to do."
-  hcf OPTIONS, SERVERS, lockfile
+  hcf OPTIONS, SERVERS
   exit
 end
 
@@ -159,7 +138,7 @@ elsif(OPTIONS.interactive)
       when "h"
         haltServer(SERVERS)
       when "v"
-        hcf OPTIONS, SERVERS, lockfile
+        hcf OPTIONS, SERVERS
         viewServer(SERVERS)
       when "ls"
         listServers(SERVERS)
@@ -185,4 +164,4 @@ elsif(OPTIONS.interactive)
 end #if
 
 #---------------------shutdown-----------------------
-hcf OPTIONS, SERVERS, lockfile
+hcf OPTIONS, SERVERS
