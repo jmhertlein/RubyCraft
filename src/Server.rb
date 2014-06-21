@@ -78,6 +78,24 @@ class Server
 
     if !started
       puts "ERROR: COULDN'T STOP SERVER"
+      puts "SENDING SIGINT TO SERVER"
+      self.sigint
+      puts "WAITING 10s TO SEE IF SIGINT KILLS IT..."
+      sleep(10)
+      if self.isRunning?
+        puts "BUCKET IS OFFICIALLY KICKED, SENDING SIGKILL"
+        self.sigkill
+        sleep(5)
+      end
+
+      if isRunning?
+        puts "PROCESS IS IMMORTAL (sigkill wasn't able to kill)"
+        puts "Giving up, good luck, have fun."
+      else
+        puts "Server died to signal, restarting."
+        self.start
+        puts "Started server"
+      end
     end
   end
 
