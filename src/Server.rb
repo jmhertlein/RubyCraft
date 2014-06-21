@@ -43,6 +43,8 @@ class Server
 
   def sigkill
     spawn "kill -9 #{self.screen_pid}"
+    sleep 5
+    spawn "screen -wipe"
   end
 
   def say(msg)
