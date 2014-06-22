@@ -17,24 +17,24 @@ require 'find'
 class Server
   attr_accessor :server_name, :server_dir, :backup_dir, :screen_name, :server_jar, :java_args
 
-  def initialize(server_name, server_dir, backup_dir)
+  def initialize server_name, server_dir, backup_dir
     @server_name = server_name
     @server_dir = server_dir
     @backup_dir = backup_dir
     @screen_name = "mc-" + @server_name.gsub(" ", "-")
   end
 
-  def start()
-    Dir.chdir(@server_dir)
-    spawn("screen -d -m -S #{@screen_name} java #{@java_args} -jar #{@server_jar}")
-    while(!self.isRunning?)
+  def start
+    Dir.chdir @server_dir
+    spawn "screen -d -m -S #{@screen_name} java #{@java_args} -jar #{@server_jar}"
+    while !self.isRunning?
       sleep 1
     end
-    spawn("screen -S #{@screen_name} -p 0 -X multiuser on")
+    spawn "screen -S #{@screen_name} -p 0 -X multiuser on"
   end
 
-  def halt()
-    spawn("screen -S #{@screen_name} -p 0 -X stuff '\nstop\n'")
+  def halt
+    spawn "screen -S #{@screen_name} -p 0 -X stuff '\nstop\n'"
   end
 
   def sigint
@@ -47,11 +47,11 @@ class Server
     spawn "screen -wipe"
   end
 
-  def say(msg)
-    spawn("screen -S #{@screen_name} -p 0 -X stuff '\nsay #{msg}\n'")
+  def say msg
+    spawn "screen -S #{@screen_name} -p 0 -X stuff '\nsay #{msg}\n'"
   end
 
-  def restart()
+  def restart
     timeout = 60*5 #5 mins
     maxTries = 3
 
@@ -83,11 +83,11 @@ class Server
       puts "SENDING SIGINT TO SERVER"
       self.sigint
       puts "WAITING 10s TO SEE IF SIGINT KILLS IT..."
-      sleep(10)
+      sleep 10
       if self.isRunning?
         puts "BUCKET IS OFFICIALLY KICKED, SENDING SIGKILL"
         self.sigkill
-        sleep(5)
+        sleep 5
       end
 
       if isRunning?
@@ -105,7 +105,7 @@ class Server
     return !(`screen -ls`.scan(/#{@screen_name}/).empty?)
   end
 
-  def backup()
+  def backup
     getWorldDirs().each do |worldDir|
       worldName = worldDir.basename
       backupFileName = "#{worldName}_#{Date.today.to_s}.zip"
@@ -116,7 +116,7 @@ class Server
     end
   end
 
-  def getWorldDirs()
+  def getWorldDirs
     worlds = []
     Dir.glob("#{@server_dir}/*/level.dat").each do |dat|
       serverFolder = Pathname.new(dat).parent  
@@ -126,7 +126,7 @@ class Server
     return worlds
   end
 
-  def getBackupPathnamesOlderThan(days)
+  def getBackupPathnamesOlderThan days 
     backups = Pathname.new @backup_dir
     oldFiles = []
 
@@ -154,14 +154,14 @@ class Server
     return oldFiles
   end
 
-  def pruneBackups(days)
+  def pruneBackups days
     getBackupPathnamesOlderThan(days).each do |oldBackup|
       oldBackup.delete
     end
   end
 
-  def getPossibleServerJarPathnames()
-    return Pathname.glob("#{@server_dir}/*.jar")
+  def getPossibleServerJarPathnames
+    return Pathname.glob "#{@server_dir}/*.jar"
   end
 
   def to_s
