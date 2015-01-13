@@ -160,7 +160,16 @@ def registerServer(servers)
     s.server_jar = jars[num].basename
   end
 
-  jvmargs = "-Xmx1G -XX:MaxPermSize=128M"
+  puts "Enter the path to the java executable you wish to use, or blank for PATH's java"
+  java_path = gets.chomp
+  if java_path.empty?
+    puts "Using PATH's java"
+  else
+    s.java_path = Pathname.new(java_path)
+    puts "Java executable set to #{s.java_path}"
+  end
+
+  jvmargs = "-XX:+UseG1GC -Xmx1G -XX:MaxPermSize=128M"
   puts "Default JVM arguments are: #{jvmargs}"
   puts "Enter custom arguments or press enter to accept default."
   newargs = gets.chomp

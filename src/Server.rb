@@ -15,7 +15,7 @@
 require 'find'
 
 class Server
-  attr_accessor :server_name, :server_dir, :backup_dir, :screen_name, :server_jar, :java_args
+  attr_accessor :server_name, :server_dir, :backup_dir, :screen_name, :server_jar, :java_path, :java_args
 
   def initialize server_name, server_dir, backup_dir
     @server_name = server_name
@@ -26,7 +26,7 @@ class Server
 
   def start
     Dir.chdir @server_dir
-    spawn "screen -d -m -S #{@screen_name} java #{@java_args} -jar #{@server_jar}"
+    spawn "screen -d -m -S #{@screen_name} #{java_path} #{@java_args} -jar #{@server_jar}"
     while !self.isRunning?
       sleep 1
     end
@@ -49,6 +49,10 @@ class Server
 
   def say msg
     spawn "screen -S #{@screen_name} -p 0 -X stuff '\nsay #{msg}\n'"
+  end
+
+  def java_path
+    return @java_path.nil? ? "java" : @java_path.realpath
   end
 
   def restart
