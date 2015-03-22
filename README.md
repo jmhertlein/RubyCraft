@@ -37,8 +37,8 @@ Batch mode is great for use with cron.
 
 I like to use `crontab -e` as my "minecraft" user to edit its crontab.
 
-    0 5 * * * rc -b -s notchland # backup every night at 5am
-    10 5 * * * rc --prune=3 -s notchland # prune backups every night at 5:10AM
-    0 6 * * * rc -w 30 -r -s notchland # reboot every night (w/ 30s warning) at 6AM
+    0 5 * * * rc -b -s notchland          # backup every night at 5am
+    10 5 * * * rc --prune=3 -s notchland  # prune backups every night at 5:10AM
+    0 6 * * * rc -w 30 -r -s notchland    # reboot every night (w/ 30s warning) at 6AM
 
 Make sure rc is in the PATH that's set for cron.
