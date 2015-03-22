@@ -92,24 +92,18 @@ def parseOptions(args)
   return options
 end
 
-def loadProfile(servers_file) 
+def loadProfile servers_file
   FileUtils.touch(servers_file)
 
-
-  file = File.open(servers_file)
-  servers = YAML.load(file.read)
-  if(!servers)
-    servers = Hash.new
-  end
-  file.close
+  servers = nil
+  File.open(servers_file) {|f| servers = YAML.load(f.read) }
+  servers = Hash.new if !servers
 
   return servers
 end
 
-def writeProfile(servers_file, servers)
-  file = File.open(servers_file, 'w')
-  file.write(servers.to_yaml)
-  file.close
+def writeProfile servers_file, servers
+  File.open(servers_file, 'w') {|f| f.write servers.to_yaml }
 end
 
 def loadConfig config_file
@@ -128,14 +122,14 @@ end
 
 ##
 # Prepare for shutdown
-def hcf(options, servers)
+def hcf options, servers
   writeProfile(options.servers_file, servers) unless servers.nil?
   output "rc exiting."
 end
 
 #------------------Menu Functions-----------------------------------
 
-def registerServer(servers)
+def registerServer servers
   puts "Server Name: (for display purposes, should be unique)"
   server_name = gets.chomp
   puts "Server directory:"
@@ -180,7 +174,7 @@ def registerServer(servers)
   s.java_args = jvmargs
 end
 
-def restartServer(servers)
+def restartServer servers
   puts "Name of server to restart:"
   server = gets.chomp
   server = servers[server]
@@ -194,7 +188,7 @@ def restartServer(servers)
   end
 end
 
-def listServers(servers)
+def listServers servers
   servers.each do |key, value|
     if(value.isRunning?)
       status = "up"
@@ -206,7 +200,7 @@ def listServers(servers)
   end
 end
 
-def unregisterServer(servers)
+def unregisterServer servers
   puts "Name of server to delete:"
   server = gets.chomp
   if(servers.has_key?(server))
@@ -216,7 +210,7 @@ def unregisterServer(servers)
   end
 end
 
-def startServer(servers)
+def startServer servers
   puts "Name of server to start:"
   server = gets.chomp
   server = servers[server]
@@ -230,7 +224,7 @@ def startServer(servers)
   end
 end
 
-def haltServer(servers)
+def haltServer servers
   puts "Name of server to halt:"
   server = gets.chomp
   server = servers[server]
@@ -244,7 +238,7 @@ def haltServer(servers)
   end
 end
 
-def backupServer(servers)
+def backupServer servers
   puts "Server name:"
   server = SERVERS[gets.chomp]
 
@@ -257,7 +251,7 @@ def backupServer(servers)
   end
 end
 
-def viewServer(servers)
+def viewServer servers
   puts "Name of server to view:"
   server = gets.chomp
   server = servers[server]
@@ -271,7 +265,7 @@ def viewServer(servers)
   end
 end
 
-def pruneBackups(servers)
+def pruneBackups servers
   puts "Name of server whose backups will be pruned:"
   server = gets.chomp
   server = servers[server]
@@ -300,7 +294,7 @@ def pruneBackups(servers)
   end
 end
 
-def printMenu()
+def printMenu
   puts "Usage: [char] [argument]"
   puts "======================="
   puts "(r)egister a server"
