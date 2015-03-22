@@ -180,7 +180,7 @@ def restartServer servers
   server = servers[server]
 
   if(server.nil?)
-    puts "Unknonw server."
+    puts "Unknown server."
   elsif(!server.isRunning?)
     puts "Server is not running."
   else
@@ -201,10 +201,11 @@ def listServers servers
 end
 
 def unregisterServer servers
-  puts "Name of server to delete:"
+  puts "Name of server to unregister:"
   server = gets.chomp
   if(servers.has_key?(server))
     servers.delete(server)
+    puts "Server unregistered."
   elsif
     puts "Unknown server."
   end
@@ -230,7 +231,7 @@ def haltServer servers
   server = servers[server]
 
   if(server.nil?)
-    puts "Unknonw server."
+    puts "Unknown server."
   elsif(!server.isRunning?)
     puts "Server is already halted."
   else
@@ -275,9 +276,7 @@ def pruneBackups servers
   
   pending = server.getBackupPathnamesOlderThan(days)
   puts "===========PENDING DELETIONS====================="
-  pending.each do |pend|
-    puts pend.realpath
-  end
+  pending.each {|pend| puts pend.realpath}
   puts "================================================="
 
   puts "This will delete #{pending.size} files. Proceed? (y/N)"
