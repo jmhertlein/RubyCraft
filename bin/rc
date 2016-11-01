@@ -21,8 +21,8 @@ require 'yaml'
 require 'fileutils'
 require 'pathname'
 
-require_relative 'Server.rb'
-require_relative 'menu.rb'
+require 'rubycraft/server'
+require 'rubycraft/menu'
 
 # ------------------------MAIN-------------------------
 

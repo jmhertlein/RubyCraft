@@ -21,7 +21,7 @@ require 'yaml'
 require 'fileutils'
 require 'pathname'
 
-require_relative 'Server.rb'
+require 'rubycraft/server'
 
 USAGE = "Usage: rc [OPTIONS]"
 
