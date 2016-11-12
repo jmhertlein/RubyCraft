@@ -137,13 +137,26 @@ def registerServer servers
   puts "Backup directory:"
   backup_dir = File.expand_path(gets.chomp)
 
+  if !File.exist? server_dir
+    puts "Server dir \"#{server_dir}\" does not exist."
+    return
+  end
+
+  if !File.exist? backup_dir
+    puts "Backup dir \"#{backup_dir}\" does not exist."
+    return
+  end
+
   s = Server.new(server_name, server_dir, backup_dir)
-  servers[server_name] = s
 
   jars = s.getPossibleServerJarPathnames
   if(jars.size == 1)
     s.server_jar = jars[0].basename
     puts "Selected #{jars[0].basename}"
+  elsif jars.size == 0
+    puts "Found no JARs in the server dir \"#{server_dir}\""
+    puts "Please move a minecraft/spigot/etc JAR into the server dir."
+    return
   else
     puts "Found more than one jar in #{server_dir}. Which number is the jar to start the server? (default=0)"
     jars.each_with_index do |jar, n|
@@ -172,6 +185,8 @@ def registerServer servers
   end
   puts "JVM arguments set to: #{jvmargs}"
   s.java_args = jvmargs
+
+  servers[server_name] = s
 end
 
 def restartServer servers
