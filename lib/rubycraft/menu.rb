@@ -137,6 +137,11 @@ def registerServer servers
   puts "Backup directory:"
   backup_dir = File.expand_path(gets.chomp)
 
+  if servers.has_key? server_name
+    puts "Server with name \"#{server_name}\" already exists."
+    return
+  end
+
   if !File.exist? server_dir
     puts "Server dir \"#{server_dir}\" does not exist."
     return

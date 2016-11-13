@@ -180,4 +180,22 @@ class Server
       return pid
     end
   end
+
+  def validate!
+    if !File.exist? @server_dir
+      raise "Server dir \"#{@server_dir}\" does not exist."
+    end
+
+    if !File.exist? @backup_dir
+      raise "Backup dir \"#{@backup_dir}\" does not exist."
+    end
+
+    if !File.exist? "#{@server_dir}/#{@server_jar}"
+      raise "Server jar \"#{"#{@server_dir}/#{@server_jar}"}\" does not exist."
+    end
+
+    if !@java_path.nil? and !File.exist? @java_path
+      raise "Java not found: #{@java_path}"
+    end
+  end
 end

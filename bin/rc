@@ -41,16 +41,28 @@ output "Options: #{OPTIONS}"
 
 if(!OPTIONS.batch && !OPTIONS.interactive)
   puts "No actions specified, nothing to do."
-  exit
+  exit 1
 end
 
 if(OPTIONS.batch && OPTIONS.interactive)
   puts "Both batch and interactive modes requested, but this isn't supported."
   puts "Please either use batch or interactive mode, but not both at once."
-  exit
+  exit 1
 end
 
 SERVERS = loadProfile(OPTIONS.servers_file)
+
+validation_errors = 0
+SERVERS.values.each do |s|
+  begin
+    s.validate!
+  rescue Exception => e
+    validation_errors += 1
+    puts "===== VALIDATION ERROR ====="
+    puts "Error validating server: #{s.server_name}"
+    puts e.message
+  end
+end
 
 #-------------------------init done-------------------
 
@@ -60,13 +72,13 @@ if(OPTIONS.batch)
   output "Entering batch mode."
   if(server.nil?)
     puts "No server specified. Specify one with --server."
-    exit
+    exit 1
   end
 
   server = SERVERS[OPTIONS.server]
   if(server.nil?)
     puts "Unknown server: " + OPTIONS.server
-    exit
+    exit 1
   end
 
   #------------------backup------------------------
@@ -86,7 +98,7 @@ if(OPTIONS.batch)
 
     if(OPTIONS.prune_days <= 0)
       puts "Error: can only prune backups >= 1 day old. (You specified #{OPTIONS.prune_days})"
-      exit
+      exit 1
     end
 
     pending = server.getBackupPathnamesOlderThan(OPTIONS.prune_days)
@@ -119,6 +131,11 @@ if(OPTIONS.batch)
 elsif(OPTIONS.interactive)
   stop = false
   printMenu()
+  if validation_errors > 0
+    puts "WARNING: THERE WERE VALIDATION ERRORS."
+    puts "It is STRONGLY recommended you review and correct them."
+  end
+
   while(!stop)
     print ">"
     STDOUT.flush
