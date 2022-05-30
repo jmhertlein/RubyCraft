@@ -194,7 +194,7 @@ class Server
       raise "Server jar \"#{"#{@server_dir}/#{@server_jar}"}\" does not exist."
     end
 
-    if @java_path.nil? || !File.exist? @java_path
+    if @java_path.nil? || !File.exist?(@java_path)
       raise "Java not found: #{@java_path}"
     end
   end
