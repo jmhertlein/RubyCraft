@@ -1,5 +1,16 @@
 # RubyCraft 
 
+## Installation
+
+In the interest of conserving entropy, I've opted not to upload this to rubygems. You should build locally.
+
+    git clone https://github.com/jmhertlein/RubyCraft.git
+    cd RubyCraft
+    gem build rubycraft
+
+    # install globally
+    sudo gem install --no-user-install ./rubycraft-*.gem
+
 ## Synopsis
 
 ### Batch
