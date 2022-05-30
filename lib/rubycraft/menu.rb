@@ -177,7 +177,7 @@ def registerServer servers
   if java_path.empty?
     puts "Using PATH's java"
   else
-    s.java_path = Pathname.new(java_path)
+    s.java_path = java_path
     puts "Java executable set to #{s.java_path}"
   end
 
