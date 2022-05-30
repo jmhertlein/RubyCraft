@@ -11,6 +11,31 @@ In the interest of conserving entropy, I've opted not to upload this to rubygems
     # install globally
     sudo gem install --no-user-install ./rubycraft-*.gem
 
+    # clean up
+    rm ./rubycraft-*.gem
+
+
+## Updating
+
+Quite similar to installation.
+
+    # if you still have the directory around,
+    cd RubyCraft
+    git pull
+
+    # otherwise
+    git clone https://github.com/jmhertlein/RubyCraft.git
+    cd RubyCraft
+
+    # then just repeat the install directions.
+    gem build rubycraft
+
+    # install globally
+    sudo gem install --no-user-install ./rubycraft-*.gem
+
+    # clean up
+    rm ./rubycraft-*.gem
+
 ## Synopsis
 
 ### Batch
